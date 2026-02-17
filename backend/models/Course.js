@@ -1,1 +1,0 @@
-// Course model schema - define your course schema here
