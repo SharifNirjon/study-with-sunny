@@ -1,37 +1,47 @@
 import { Router } from 'express';
-export default userrouter;
+import User from '../models/user.model.js';
 
+const userRouter = Router();
 
-const userrouter = Router();
-
-userrouter.get('/', (req, res) => {
-  // User profile logic here
-  res.json({ title: 'Get all users' });
-}       
-);
-
-userrouter.get('/:id', (req, res) => {
-  // User profile logic here
-  res.json({ title: 'Get user details' });
+// Get all users
+userRouter.get('/', async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-
-userrouter.get('/', (req, res) => {
-  // User profile logic here
-  res.json({ title: 'Create new user' });
+// Get user by ID
+userRouter.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-
-userrouter.get('/:id', (req, res) => {
-  // User profile logic here
-  res.json({ title: 'Update user details' });
+// Update user
+userRouter.put('/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-
-userrouter.delete('/:id', (req, res) => {
-  // User profile logic here
-  res.json({ title: 'Delete user details' });
+// Delete user
+userRouter.delete('/:id', async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-
-
+export default userRouter;
